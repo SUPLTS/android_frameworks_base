@@ -140,6 +140,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
     private final Context mContext;
     private final boolean mIsMonetEnabled;
     private final UserTracker mUserTracker;
+    private final ConfigurationController mConfigurationController;
     private final DeviceProvisionedController mDeviceProvisionedController;
     private final Resources mResources;
     // Current wallpaper colors associated to a user.
@@ -173,8 +174,6 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
     // Determines if we should ignore THEME_CUSTOMIZATION_OVERLAY_PACKAGES setting changes.
     private boolean mSkipSettingChange;
 
-    private final ConfigurationController mConfigurationController;
-
     private float mChromaFactor = 1.0f;
     private float mLuminanceFactor = 1.0f;
     private boolean mTintBackground;
@@ -182,6 +181,15 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
     private int mColorOverride;
     private boolean mCustomBgColor;
     private int mBgColorOverride;
+
+    private final ConfigurationListener mConfigurationListener =
+            new ConfigurationListener() {
+                @Override
+                public void onUiModeChanged() {
+                    Log.i(TAG, "Re-applying theme on UI change");
+                    reevaluateSystemTheme(true /* forceReload */);
+                }
+            };
 
     private final DeviceProvisionedListener mDeviceProvisionedListener =
             new DeviceProvisionedListener() {
@@ -413,6 +421,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
         mContext = context;
         mIsMonochromaticEnabled = featureFlags.isEnabled(Flags.MONOCHROMATIC_THEME);
         mIsMonetEnabled = featureFlags.isEnabled(Flags.MONET);
+        mConfigurationController = configurationController;
         mDeviceProvisionedController = deviceProvisionedController;
         mBroadcastDispatcher = broadcastDispatcher;
         mUserManager = userManager;
@@ -426,7 +435,6 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
         mUserTracker = userTracker;
         mResources = resources;
         mWakefulnessLifecycle = wakefulnessLifecycle;
-        mConfigurationController = configurationController;
         mTunerService = tunerService;
         dumpManager.registerDumpable(TAG, this);
 
@@ -543,6 +551,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
 
         mUserTracker.addCallback(mUserTrackerCallback, mMainExecutor);
 
+        mConfigurationController.addCallback(mConfigurationListener);
         mDeviceProvisionedController.addCallback(mDeviceProvisionedListener);
 
         // All wallpaper color and keyguard logic only applies when Monet is enabled.
@@ -906,13 +915,6 @@ public class ThemeOverlayController implements CoreStartable, Dumpable, TunerSer
         }
         return style;
     }
-
-    private final ConfigurationListener mConfigurationListener = new ConfigurationListener() {
-        @Override
-        public void onUiModeChanged() {
-            reevaluateSystemTheme(true /* forceReload */);
-        }
-    };
 
     @Override
     public void dump(@NonNull PrintWriter pw, @NonNull String[] args) {
