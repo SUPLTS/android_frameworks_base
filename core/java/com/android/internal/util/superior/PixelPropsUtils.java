@@ -81,6 +81,7 @@ public class PixelPropsUtils {
             "com.ea.gp.fifamobile",
             "com.gameloft.android.ANMP.GloftA9HM",
             "com.madfingergames.legends",
+            "com.mobile.legends",
             "com.pearlabyss.blackdesertm",
             "com.pearlabyss.blackdesertm.gl"
     };
@@ -119,8 +120,7 @@ public class PixelPropsUtils {
             "com.ea.gp.apexlegendsmobilefps",
             "com.levelinfinite.hotta.gp",
             "com.supercell.clashofclans",
-            "com.vng.mlbbvn",
-            "com.mobile.legends"
+            "com.vng.mlbbvn"
     };
 
     private static final Map<String, Object> propsToChangeMI13P;
