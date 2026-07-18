@@ -812,8 +812,7 @@ public class ApplicationPackageManager extends PackageManager {
         String packageName = ActivityThread.currentPackageName();
         if (packageName != null &&
                 packageName.contains("com.google.android.apps.photos") &&
-                (name.contains("PIXEL_2022_EXPERIENCE") ||
-                name.contains("PIXEL_2022_MIDYEAR_EXPERIENCE") ||
+                (name.contains("PIXEL_2022_MIDYEAR_EXPERIENCE") ||
                 name.contains("PIXEL_2021_EXPERIENCE") ||
                 name.contains("PIXEL_2021_MIDYEAR_EXPERIENCE") ||
                 name.contains("PIXEL_2020_EXPERIENCE") ||
@@ -823,11 +822,6 @@ public class ApplicationPackageManager extends PackageManager {
                 name.contains("PIXEL_2019_MIDYEAR_EXPERIENCE") ||
                 name.contains("PIXEL_2018_PRELOAD") ||
                 name.contains("PIXEL_2017_PRELOAD"))) {
-            return false;
-        } else if (packageName != null &&
-                packageName.contains("com.google.android.as") &&
-                (name.contains("PIXEL_2022_EXPERIENCE") ||
-                name.contains("PIXEL_2022_MIDYEAR_EXPERIENCE"))) {
             return false;
         }
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
