@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2022 The Pixel Experience Project
  *               2021-2022 crDroid Android Project
- *           (C) 2023 ArrowOS
- *           (C) 2023 The LibreMobileOS Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +17,7 @@
 
 package com.android.internal.util.superior;
 
-import android.app.ActivityTaskManager;
 import android.app.Application;
-import android.app.TaskStackListener;
-import android.content.Context;
-import android.content.ComponentName;
-import android.os.Binder;
-import android.os.Process;
 import android.os.Build;
 import android.os.SystemProperties;
 import android.os.Build.VERSION;
@@ -42,11 +34,6 @@ public class PixelPropsUtils {
 
     private static final String TAG = PixelPropsUtils.class.getSimpleName();
     private static final String DEVICE = "ro.product.device";
-
-    private static final String PACKAGE_GMS = "com.google.android.gms";
-    private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
-            "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
-
     private static final boolean DEBUG = false;
 
     private static final Map<String, Object> propsToChangeGeneric;
@@ -119,8 +106,8 @@ public class PixelPropsUtils {
             "sunfish"
     };
 
-    private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
+    private static volatile boolean sIsGms = false;
+    private static volatile boolean sIsFinsky = false;
 
     static {
         propsToKeep = new HashMap<>();
@@ -214,9 +201,8 @@ public class PixelPropsUtils {
                     Log.d(TAG, "Defining " + key + " prop for: " + packageName);
                 setPropValue(key, value);
             }
-            if (packageName.equals(PACKAGE_GMS)) {
+            if (packageName.equals("com.google.android.gms")) {
                 final String processName = Application.getProcessName();
-                 sProcessName = processName;
                 if (processName.equals("com.google.android.gms.unstable")) {
                     sIsGms = true;
                     spoofBuildGms();
@@ -276,60 +262,13 @@ public class PixelPropsUtils {
     }
 
     private static void spoofBuildGms() {
-       final boolean was = isGmsAddAccountActivityOnTop();
-        final TaskStackListener taskStackListener = new TaskStackListener() {
-            @Override
-            public void onTaskStackChanged() {
-                final boolean is = isGmsAddAccountActivityOnTop();
-                if (is ^ was) {
-                    dlog("GmsAddAccountActivityOnTop is:" + is + " was:" + was +
-                            ", killing myself!"); // process will restart automatically later
-                    Process.killProcess(Process.myPid());
-                }
-            }
-        };
-        if (!was) {
-            dlog("Spoofing build for GMS");
-        // Alter build parameters to pixel 2 for avoiding hardware attestation enforcement
+        // Alter build parameters to pixel 2 for avoiding hardware attestation
+        // enforcement
         setBuildField("DEVICE", "walleye");
         setBuildField("FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys");
         setBuildField("MODEL", "Pixel 2");
         setBuildField("PRODUCT", "walleye");
         setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.O);
-        } else {
-            dlog("Skip spoofing build for GMS, because GmsAddAccountActivityOnTop");
-        }
-        try {
-            ActivityTaskManager.getService().registerTaskStackListener(taskStackListener);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to register task stack listener!", e);
-        }
-    }
-
-    private static boolean isGmsAddAccountActivityOnTop() {
-        try {
-            final ActivityTaskManager.RootTaskInfo focusedTask =
-                    ActivityTaskManager.getService().getFocusedRootTaskInfo();
-            return focusedTask != null && focusedTask.topActivity != null
-                    && focusedTask.topActivity.equals(GMS_ADD_ACCOUNT_ACTIVITY);
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to get top activity!", e);
-        }
-        return false;
-    }
-
-    public static boolean shouldBypassTaskPermission(Context context) {
-        // GMS doesn't have MANAGE_ACTIVITY_TASKS permission
-        final int callingUid = Binder.getCallingUid();
-        final int gmsUid;
-        try {
-            gmsUid = context.getPackageManager().getApplicationInfo(PACKAGE_GMS, 0).uid;
-            dlog("shouldBypassTaskPermission: gmsUid:" + gmsUid + " callingUid:" + callingUid);
-        } catch (Exception e) {
-            Log.e(TAG, "shouldBypassTaskPermission: unable to get gms uid", e);
-            return false;
-        }
-        return gmsUid == callingUid;
     }
 
     private static boolean isCallerSafetyNet() {
@@ -349,9 +288,8 @@ public class PixelPropsUtils {
         }
     }
 
-    public static void dlog(String msg) {
-      if (DEBUG) Log.d(TAG, msg);
-        if (DEBUG) Log.d(TAG, "[" + sProcessName + "] " + msg);
+    static void dlog(String msg) {
+        if (DEBUG)
+            Log.d(TAG, msg);
     }
-
 }
