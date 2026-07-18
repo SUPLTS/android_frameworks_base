@@ -819,9 +819,7 @@ public class ApplicationPackageManager extends PackageManager {
                 name.contains("PIXEL_2020_MIDYEAR_EXPERIENCE") ||
                 name.contains("PIXEL_2019_EXPERIENCE") ||
                 name.contains("PIXEL_2019_PRELOAD") ||
-                name.contains("PIXEL_2019_MIDYEAR_EXPERIENCE") ||
-                name.contains("PIXEL_2018_PRELOAD") ||
-                name.contains("PIXEL_2017_PRELOAD")) {
+                name.contains("PIXEL_2019_MIDYEAR_EXPERIENCE")) {
             return false;
         }
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
