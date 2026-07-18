@@ -360,27 +360,23 @@ public class PixelPropsUtils {
     }
 
     private static void spoofBuildGms() {
-        // Alter build parameters to pixel 2 for avoiding hardware attestation enforcement
-        setBuildField("DEVICE", "walleye");
-        setBuildField("FINGERPRINT", "google/walleye/walleye:8.1.0/OPM1.171019.011/4448085:user/release-keys");
-        setBuildField("MODEL", "Pixel 2");
-        setBuildField("PRODUCT", "walleye");
-        setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.O);
+        // Alter model name and fingerprint to avoid hardware attestation enforcement
+        setBuildField("FINGERPRINT", "google/marlin/marlin:7.1.2/NJH47F/4146041:user/release-keys");
+        setBuildField("PRODUCT", "marlin");
+        setBuildField("DEVICE", "marlin");
+        setBuildField("MODEL", "Pixel XL");
+        setVersionField("DEVICE_INITIAL_SDK_INT", Build.VERSION_CODES.N_MR1);
     }
 
     private static boolean isCallerSafetyNet() {
-        return Arrays.stream(Thread.currentThread().getStackTrace())
+        return sIsGms && Arrays.stream(Thread.currentThread().getStackTrace())
                 .anyMatch(elem -> elem.getClassName().contains("DroidGuard"));
     }
 
     public static void onEngineGetCertificateChain() {
-        // Check stack for SafetyNet
-        if (sIsGms && isCallerSafetyNet()) {
-            throw new UnsupportedOperationException();
-        }
-
-        // Check stack for PlayIntegrity
-        if (sIsFinsky) {
+        // Check stack for SafetyNet or Play Integrity
+        if (isCallerSafetyNet() || sIsFinsky) {
+            Log.i(TAG, "Blocked key attestation sIsGms=" + sIsGms + " sIsFinsky=" + sIsFinsky);
             throw new UnsupportedOperationException();
         }
     }
