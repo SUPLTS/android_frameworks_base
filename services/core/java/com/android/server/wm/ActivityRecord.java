@@ -2772,6 +2772,19 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         attachStartingSurfaceToAssociatedTask();
     }
 
+    /**
+     * If the device is locked and the app does not request showWhenLocked,
+     * defer removing the starting window until the transition is complete.
+     * This prevents briefly appearing the app context and causing secure concern.
+     */
+    void deferStartingWindowRemovalForKeyguardUnoccluding() {
+        if (mStartingData != null && !mStartingData.mRemoveAfterTransition
+                && isKeyguardLocked() && !canShowWhenLockedInner(this) && !isVisibleRequested()
+                && isAnimating(PARENTS | CHILDREN, ANIMATION_TYPE_APP_TRANSITION)) {
+            mStartingData.mRemoveAfterTransition = true;
+        }
+    }
+
     void removeStartingWindow() {
         boolean prevEligibleForLetterboxEducation = isEligibleForLetterboxEducation();
 
@@ -2810,6 +2823,9 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         final StartingData startingData = mStartingData;
         final WindowState startingWindow = mStartingWindow;
         if (mStartingData != null) {
+            if (mStartingData.mRemoveAfterTransition) {
+                return;
+            }
             surface = mStartingSurface;
             mStartingData = null;
             mStartingSurface = null;
@@ -2874,7 +2890,7 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         reparent(newTaskFrag, position);
     }
 
-    private boolean isHomeIntent(Intent intent) {
+    static boolean isHomeIntent(Intent intent) {
         return ACTION_MAIN.equals(intent.getAction())
                 && (intent.hasCategory(CATEGORY_HOME)
                 || intent.hasCategory(CATEGORY_SECONDARY_HOME))
@@ -4429,6 +4445,7 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
                 tStartingWindow.mToken = this;
                 tStartingWindow.mActivityRecord = this;
 
+                mStartingData.mRemoveAfterTransition = false;
                 ProtoLog.v(WM_DEBUG_ADD_REMOVE,
                         "Removing starting %s from %s", tStartingWindow, fromActivity);
                 mTransitionController.collect(tStartingWindow);
@@ -4583,15 +4600,20 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
         if (r == null || r.getTaskFragment() == null) {
             return false;
         }
-        if (!r.inPinnedWindowingMode() && (r.mShowWhenLocked || r.containsShowWhenLockedWindow())) {
+        if (canShowWhenLockedInner(r)) {
             return true;
         } else if (r.mInheritShownWhenLocked) {
             final ActivityRecord activity = r.getTaskFragment().getActivityBelow(r);
-            return activity != null && !activity.inPinnedWindowingMode()
-                    && (activity.mShowWhenLocked || activity.containsShowWhenLockedWindow());
+            return activity != null && canShowWhenLockedInner(activity);
         } else {
             return false;
         }
+    }
+
+    /** @see #canShowWhenLocked(ActivityRecord) */
+    private static boolean canShowWhenLockedInner(@NonNull ActivityRecord r) {
+        return !r.inPinnedWindowingMode() &&
+                (r.mShowWhenLocked || r.containsShowWhenLockedWindow());
     }
 
     /**
@@ -7689,6 +7711,10 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
             mThumbnail = null;
         }
 
+        if (mStartingData != null && mStartingData.mRemoveAfterTransition) {
+            mStartingData.mRemoveAfterTransition = false;
+            removeStartingWindowAnimation(false /* prepareAnimation */);
+        }
         // WindowState.onExitAnimationDone might modify the children list, so make a copy and then
         // traverse the copy.
         final ArrayList<WindowState> children = new ArrayList<>(mChildren);
