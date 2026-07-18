@@ -35,23 +35,38 @@ public class PixelPropsUtils {
     private static final String DEVICE = "ro.product.device";
     private static final boolean DEBUG = false;
 
+    private static final String SAMSUNG = "com.samsung.android.";
+    private static final boolean PRODUCT_SUPPORT_HIGH_FPS =
+            SystemProperties.getBoolean("ro.device.support_high_fps", false);
+    private static final boolean PRODUCT_SUPPORT_CONTENT_REFRESH =
+            SystemProperties.getBoolean("ro.surface_flinger.use_content_detection_for_refresh_rate", false);
+    private static final Map<String, Object> propsToChangePUBG;
+    private static final Map<String, Object> propsToChangeCOD;
     private static final Map<String, Object> propsToChange;
     private static final Map<String, Object> propsToChangePixel5;
     private static final Map<String, Object> propsToChangePixel7Pro;
     private static final Map<String, Object> propsToChangePixel6Pro;
     private static final Map<String, Object> propsToChangePixelXL;
-    private static final Map<String, Object> propsToChangeROG1;
-    private static final Map<String, Object> propsToChangeXP5;
-    private static final Map<String, Object> propsToChangeOP8P;
-    private static final Map<String, Object> propsToChangeOP9P;
-    private static final Map<String, Object> propsToChangeMI11;
     private static final Map<String, ArrayList<String>> propsToKeep;
 
     private static final String[] packagesToChangePixel7Pro = {
+<<<<<<< HEAD
             "com.google.android.apps.privacy.wildlife",
             "com.google.android.apps.wallpaper.pixel",
             "com.google.android.apps.wallpaper"
     };
+=======
+            "com.google.android.gms",
+            "com.google.android.apps.privacy.wildlife",
+            "com.google.android.apps.wallpaper.pixel",
+            "com.google.android.apps.wallpaper",
+            "com.google.android.apps.subscriptions.red",
+            "com.google.android.inputmethod.latin",
+            "com.google.android.apps.wellbeing",
+            "com.google.android.as",
+            "com.google.android.gms.persistent",
+            "com.google.android.googlequicksearchbox"
+>>>>>>> parent of eee768a43c2c (PixelPropsUtils: Add toggle for Gaming and google photos spoofs)
 
    private static final String[] packagesToChangePixel5 = {
             "com.google.android.tts",
@@ -59,26 +74,28 @@ public class PixelPropsUtils {
             "com.google.android.apps.wellbeing"
     };
 
-    private static final String[] packagesToChangePixelXL = {
-            "com.samsung.accessory",
-            "com.samsung.accessory.fridaymgr",
-            "com.samsung.accessory.berrymgr",
-            "com.samsung.accessory.neobeanmgr",
-            "com.samsung.android.app.watchmanager",
-            "com.samsung.android.geargplugin",
-            "com.samsung.android.gearnplugin",
-            "com.samsung.android.modenplugin",
-            "com.samsung.android.neatplugin",
-            "com.samsung.android.waterplugin"
+    private static final String[] packagesToChangeCOD = {
+        "com.activision.callofduty.shooter"
+    };
+
+    private static final String[] packagesToChangePUBG = {
+        "com.tencent.ig",
+        "com.pubg.krmobile",
+        "com.vng.pubgmobile",
+        "com.rekoo.pubgm",
+        "com.pubg.imobile",
+        "com.pubg.newstate",
+        "com.gameloft.android.ANMP.GloftA9HM" // Asphalt 9
     };
 
     private static final String[] extraPackagesToChange = {
             "com.android.chrome",
             "com.breel.wallpapers20",
-            "com.nhs.online.nhsonline",
-            "com.netflix.mediaclient",
-            "com.nothing.smartcenter",
-            "com.snapchat.android"
+            "com.nothing.smartcenter"
+    };
+
+    private static final String[] packagesToChangePixelXL = {
+           "com.google.android.apps.photos",
     };
 
     private static final String[] packagesToKeep = {
@@ -100,45 +117,8 @@ public class PixelPropsUtils {
             "com.google.android.youtube",
             "com.google.android.apps.youtube.kids",
             "com.google.android.apps.youtube.music",
-            "com.google.android.apps.recorder"
-    };
-
-    private static final String[] packagesToChangeROG1 = {
-            "com.dts.freefireth",
-            "com.dts.freefiremax",
-            "com.madfingergames.legends"
-    };
-
-    private static final String[] packagesToChangeXP5 = {
-            "com.activision.callofduty.shooter",
-            "com.tencent.tmgp.kr.codm",
-            "com.garena.game.codm",
-            "com.vng.codmvn"
-    };
-
-    private static final String[] packagesToChangeOP8P = {
-            "com.tencent.ig",
-            "com.pubg.imobile",
-            "com.pubg.krmobile",
-            "com.vng.pubgmobile",
-            "com.rekoo.pubgm",
-            "com.tencent.tmgp.pubgmhd",
-            "com.riotgames.league.wildrift",
-            "com.riotgames.league.wildrifttw",
-            "com.riotgames.league.wildriftvn",
-            "com.netease.lztgglobal"
-    };
-
-    private static final String[] packagesToChangeOP9P = {
-            "com.epicgames.fortnite",
-            "com.epicgames.portal"
-    };
-
-    private static final String[] packagesToChangeMI11 = {
-            "com.ea.gp.apexlegendsmobilefps",
-            "com.levelinfinite.hotta.gp",
-            "com.mobile.legends",
-            "com.tencent.tmgp.sgame"
+            "com.google.android.apps.recorder",
+            "com.google.android.apps.wearables.maestro.companion"
     };
 
     // Codenames for currently supported Pixels by Google
@@ -167,6 +147,7 @@ public class PixelPropsUtils {
         propsToChangePixel7Pro.put("DEVICE", "cheetah");
         propsToChangePixel7Pro.put("PRODUCT", "cheetah");
         propsToChangePixel7Pro.put("MODEL", "Pixel 7 Pro");
+<<<<<<< HEAD
         propsToChangePixel7Pro.put("FINGERPRINT", "google/cheetah/cheetah:13/TQ1A.230205.002/9471150:user/release-keys");
         propsToChangePixel6Pro = new HashMap<>();
         propsToChangePixel6Pro.put("BRAND", "google");
@@ -175,6 +156,9 @@ public class PixelPropsUtils {
         propsToChangePixel6Pro.put("PRODUCT", "raven");
         propsToChangePixel6Pro.put("MODEL", "Pixel 6 Pro");
         propsToChangePixel6Pro.put("FINGERPRINT", "google/raven/raven:13/TQ1A.230205.002/9471150:user/release-keys");
+=======
+        propsToChangePixel7Pro.put("FINGERPRINT", "google/cheetah/cheetah:13/TQ1A.230105.001.A2/9325679:user/release-keys");
+>>>>>>> parent of eee768a43c2c (PixelPropsUtils: Add toggle for Gaming and google photos spoofs)
         propsToChangePixel5 = new HashMap<>();
         propsToChangePixel5.put("BRAND", "google");
         propsToChangePixel5.put("MANUFACTURER", "Google");
@@ -189,26 +173,10 @@ public class PixelPropsUtils {
         propsToChangePixelXL.put("PRODUCT", "marlin");
         propsToChangePixelXL.put("MODEL", "Pixel XL");
         propsToChangePixelXL.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
-        propsToChangeROG1 = new HashMap<>();
-        propsToChangeROG1.put("MODEL", "ASUS_Z01QD");
-        propsToChangeROG1.put("MANUFACTURER", "asus");
-        propsToChangeXP5 = new HashMap<>();
-        propsToChangeXP5.put("MODEL", "SO-52A");
-        propsToChangeOP8P = new HashMap<>();
-        propsToChangeOP8P.put("MODEL", "IN2020");
-        propsToChangeOP8P.put("MANUFACTURER", "OnePlus");
-        propsToChangeOP9P = new HashMap<>();
-        propsToChangeOP9P.put("BRAND", "OnePlus");
-        propsToChangeOP9P.put("MANUFACTURER", "OnePlus");
-        propsToChangeOP9P.put("DEVICE", "OnePlus9Pro");
-        propsToChangeOP9P.put("PRODUCT", "OnePlus9Pro_EEA");
-        propsToChangeOP9P.put("MODEL", "LE2123");
-        propsToChangeMI11 = new HashMap<>();
-        propsToChangeMI11.put("BRAND", "Xiaomi");
-        propsToChangeMI11.put("MANUFACTURER", "Xiaomi");
-        propsToChangeMI11.put("DEVICE", "star");
-        propsToChangeMI11.put("PRODUCT", "star");
-        propsToChangeMI11.put("MODEL", "M2102K1G");
+        propsToChangePUBG = new HashMap<>();
+        propsToChangePUBG.put("MODEL", "GM1917");
+        propsToChangeCOD = new HashMap<>();
+        propsToChangeCOD.put("MODEL", "SO-52A");
     }
 
     public static void setProps(String packageName) {
@@ -219,11 +187,13 @@ public class PixelPropsUtils {
             return;
         }
         if (packageName.startsWith("com.google.")
+                || packageName.startsWith(SAMSUNG)
                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
 
             boolean isPixelDevice = Arrays.asList(pixelCodenames).contains(SystemProperties.get(DEVICE));
 
             if (packageName.equals("com.google.android.apps.photos")) {
+<<<<<<< HEAD
                 if (SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
                     propsToChange.putAll(propsToChangePixelXL);
                 } else {
@@ -232,11 +202,14 @@ public class PixelPropsUtils {
                 }
             } else if (isPixelDevice) {
                 return;
+=======
+                propsToChange.putAll(propsToChangePixelXL);
+>>>>>>> parent of eee768a43c2c (PixelPropsUtils: Add toggle for Gaming and google photos spoofs)
             } else if (packageName.equals("com.android.vending")) {
                 sIsFinsky = true;
                 return;
-            } else {
-                if (Arrays.asList(packagesToChangePixel7Pro).contains(packageName)) {
+            } else if (!isPixelDevice) {
+                if ((Arrays.asList(packagesToChangePixel7Pro).contains(packageName))) {
                     propsToChange.putAll(propsToChangePixel7Pro);
                 } else if (Arrays.asList(packagesToChangePixelXL).contains(packageName)) {
                     propsToChange.putAll(propsToChangePixelXL);
@@ -267,50 +240,33 @@ public class PixelPropsUtils {
                 }
                 return;
             }
-            // Set proper indexing fingerprint
+
+        if (PRODUCT_SUPPORT_HIGH_FPS || PRODUCT_SUPPORT_CONTENT_REFRESH) {
+            if (Arrays.asList(packagesToChangePUBG).contains(packageName)){
+                if (DEBUG){
+                    Log.d(TAG, "Defining props for: " + packageName);
+                }
+                for (Map.Entry<String, Object> prop : propsToChangePUBG.entrySet()) {
+                    String key = prop.getKey();
+                    Object value = prop.getValue();
+                    setPropValue(key, value);
+                }
+            }
+            if (Arrays.asList(packagesToChangeCOD).contains(packageName)){
+                if (DEBUG){
+                    Log.d(TAG, "Defining props for: " + packageName);
+                }
+                for (Map.Entry<String, Object> prop : propsToChangeCOD.entrySet()) {
+                    String key = prop.getKey();
+                    Object value = prop.getValue();
+                    setPropValue(key, value);
+                }
+            }
+        }
+
+           // Set proper indexing fingerprint
             if (packageName.equals("com.google.android.settings.intelligence")) {
                 setPropValue("FINGERPRINT", Build.VERSION.INCREMENTAL);
-            }
-        } else {
-
-            if (!SystemProperties.getBoolean("persist.sys.pixelprops.games", false))
-                return;
-
-            if (Arrays.asList(packagesToChangeROG1).contains(packageName)) {
-                if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-                for (Map.Entry<String, Object> prop : propsToChangeROG1.entrySet()) {
-                    String key = prop.getKey();
-                    Object value = prop.getValue();
-                    setPropValue(key, value);
-                }
-            } else if (Arrays.asList(packagesToChangeXP5).contains(packageName)) {
-                if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-                for (Map.Entry<String, Object> prop : propsToChangeXP5.entrySet()) {
-                    String key = prop.getKey();
-                    Object value = prop.getValue();
-                    setPropValue(key, value);
-                }
-            } else if (Arrays.asList(packagesToChangeOP8P).contains(packageName)) {
-                if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-                for (Map.Entry<String, Object> prop : propsToChangeOP8P.entrySet()) {
-                    String key = prop.getKey();
-                    Object value = prop.getValue();
-                    setPropValue(key, value);
-                }
-            } else if (Arrays.asList(packagesToChangeOP9P).contains(packageName)) {
-                if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-                for (Map.Entry<String, Object> prop : propsToChangeOP9P.entrySet()) {
-                    String key = prop.getKey();
-                    Object value = prop.getValue();
-                    setPropValue(key, value);
-                }
-            } else if (Arrays.asList(packagesToChangeMI11).contains(packageName)) {
-                if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
-                for (Map.Entry<String, Object> prop : propsToChangeMI11.entrySet()) {
-                    String key = prop.getKey();
-                    Object value = prop.getValue();
-                    setPropValue(key, value);
-                }
             }
         }
     }
